@@ -1,0 +1,11 @@
+*/bin
+*/obj
+*.user
+*.suo
+_ReSharper.*
+*.sln.cache
+*.pdb
+ipch
+.svn
+*.sdf
+*.opensdf

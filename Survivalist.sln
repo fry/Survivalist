@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Survivalist", "Survivalist\Survivalist.csproj", "{E37B37C5-DA80-4608-BA69-7C036F54E538}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{1BCC351F-0266-4E85-A40A-A94A6B5F6784}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E37B37C5-DA80-4608-BA69-7C036F54E538}.Debug|x86.ActiveCfg = Debug|x86
+		{E37B37C5-DA80-4608-BA69-7C036F54E538}.Debug|x86.Build.0 = Debug|x86
+		{E37B37C5-DA80-4608-BA69-7C036F54E538}.Release|x86.ActiveCfg = Release|x86
+		{E37B37C5-DA80-4608-BA69-7C036F54E538}.Release|x86.Build.0 = Release|x86
+		{1BCC351F-0266-4E85-A40A-A94A6B5F6784}.Debug|x86.ActiveCfg = Debug|x86
+		{1BCC351F-0266-4E85-A40A-A94A6B5F6784}.Debug|x86.Build.0 = Debug|x86
+		{1BCC351F-0266-4E85-A40A-A94A6B5F6784}.Release|x86.ActiveCfg = Release|x86
+		{1BCC351F-0266-4E85-A40A-A94A6B5F6784}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
