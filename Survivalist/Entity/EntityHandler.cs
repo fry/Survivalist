@@ -8,6 +8,7 @@ namespace Survivalist {
 		World world;
 		List<Entity> entities = new List<Entity>();
 		List<Player> players = new List<Player>();
+		List<Entity> removeEntities = new List<Entity>();
 
 		HashSet<EntityTracker> trackedEntities = new HashSet<EntityTracker>();
 
@@ -41,13 +42,8 @@ namespace Survivalist {
 		}
 
 		public void RemoveEntity(Entity entity) {
-			// Remove tracker and player from tracked entities
-			var tracker = trackedEntities.FirstOrDefault(e => e.Equals(entity));
-			if (tracker != null) {
-				trackedEntities.Remove(tracker);
-				tracker.RemoveSelf();
-			}
-			entities.Remove(entity);
+			entity.Deleted = true;
+			removeEntities.Add(entity);
 		}
 
 		public void AddPlayer(Player player) {
@@ -70,6 +66,17 @@ namespace Survivalist {
 		}
 
 		public void Tick() {
+			foreach (var remove in removeEntities) {
+				// Remove tracker and player from tracked entities
+				var tracker = trackedEntities.FirstOrDefault(e => e.Equals(remove));
+				if (tracker != null) {
+					trackedEntities.Remove(tracker);
+					tracker.RemoveSelf();
+				}
+				entities.Remove(remove);
+			}
+			removeEntities.Clear();
+
 			foreach (var tracker in trackedEntities) {
 				tracker.UpdatePosition(players);
 				if (tracker.HasMoved && tracker.Origin is Player) {

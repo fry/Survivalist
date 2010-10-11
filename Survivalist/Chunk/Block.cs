@@ -29,13 +29,13 @@ namespace Survivalist {
 		}
 
 		public virtual void OnBlockDestroyed(BlockUpdateEventArgs args) {
-			/*args.World.EntityHandler.AddEntity(new ItemEntity {
+			args.World.EntityHandler.AddEntity(new ItemEntity {
 				TypeId = (int)BlockType.Dirt,
 				Count = 1,
 				X = args.X + 0.5,
 				Y = args.Y,
 				Z = args.Z + 0.5
-			});*/
+			});
 		}
 
 		static Block() {
@@ -53,6 +53,7 @@ namespace Survivalist {
 		}
 	}
 
+	// Stolen from "MySMP"
 	public enum BlockType {
 		Air = 0,
 		Stone = 1,
@@ -61,7 +62,7 @@ namespace Survivalist {
 		Cobblestone = 4,
 		Planks = 5,
 		Plant = 6,
-		Admincrete = 7,
+		Bedrock = 7,
 		Water = 8,
 		StillWater = 9,
 		Lava = 10,

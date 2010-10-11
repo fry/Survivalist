@@ -186,6 +186,52 @@ namespace Survivalist {
 			handler.Handle(this);
 		}
 	}
+
+	public class PlayerCollectItemEntityPacket : Packet {
+		public int CollectEntityId;
+		public int CollectingEntityId;
+
+		public PlayerCollectItemEntityPacket() { }
+
+		public override void Write(NetworkWriter writer) {
+			writer.WriteInt32(CollectEntityId);
+			writer.WriteInt32(CollectingEntityId);
+		}
+
+		public override void Read(NetworkReader reader) {
+			CollectEntityId = reader.ReadInt32();
+			CollectingEntityId = reader.ReadInt32();
+		}
+
+		public override void Handle(PacketHandler handler) {
+			handler.Handle(this);
+		}
+	}
+
+	public class PlayerAddItemPacket : Packet {
+		public short TypeId;
+		public byte Count;
+		public short Durability;
+
+		public PlayerAddItemPacket() { }
+
+		public override void Write(NetworkWriter writer) {
+			writer.WriteInt16(TypeId);
+			writer.WriteByte(Count);
+			writer.WriteInt16(Durability);
+		}
+
+		public override void Read(NetworkReader reader) {
+			TypeId = reader.ReadInt16();
+			Count = reader.ReadByte();
+			Durability = reader.ReadInt16();
+		}
+
+		public override void Handle(PacketHandler handler) {
+			handler.Handle(this);
+		}
+	}
+
 	#endregion
 
 	#region UpdatePlayerPackets

@@ -8,6 +8,9 @@ namespace Survivalist {
 	 * ensures position updates are sent to those. */
 	public class EntityTracker {
 		public static int ChunkRange = 10;
+		public static double TouchDistance = 0.5;
+		public static double ChunkCheckDistance = 4;
+
 		// Whether this entity as moved a signification distance last tick
 		public bool HasMoved { get; protected set; }
 		public Entity Origin { get; protected set; }
@@ -23,6 +26,10 @@ namespace Survivalist {
 		double lastUpdateX;
 		double lastUpdateY;
 		double lastUpdateZ;
+
+		// The last position we checked for chunk updates
+		double lastChunkUpdateX;
+		double lastChunkUpdateZ;
 
 		// The last position we sent to our subscribers
 		int lastPosSentX;
@@ -63,15 +70,27 @@ namespace Survivalist {
 
 		public void UpdatePosition(IEnumerable<Player> players) {
 			HasMoved = false;
+
+			if (Origin.Deleted)
+				return;
+
 			// Run range check on the first run or if we moved a certain distance
-			if (firstRun || Origin.Distance(lastUpdateX, lastUpdateY, lastUpdateZ) > 4*4) {
+			var distanceMoved = Origin.Distance(lastUpdateX, lastUpdateY, lastUpdateZ);
+			if (firstRun || distanceMoved > TouchDistance*TouchDistance) {
 				HasMoved = true;
 				UpdateSubscriber(players);
 
-				// Update chunks for the player
+				lastUpdateX = Origin.X;
+				lastUpdateY = Origin.Y;
+				lastUpdateZ = Origin.Z;
+			}
+
+			var distanceMoved2 = Origin.Distance(lastChunkUpdateX, Origin.Y, lastChunkUpdateZ);
+			// Update chunks for the player
+			if (firstRun || distanceMoved2 > ChunkCheckDistance * ChunkCheckDistance) {
 				if (Origin is Player) {
-					int oldChunkX = (int)(lastUpdateX / 16);
-					int oldChunkZ = (int)(lastUpdateZ / 16);
+					int oldChunkX = (int)(lastChunkUpdateX / 16);
+					int oldChunkZ = (int)(lastChunkUpdateZ / 16);
 					int newChunkX = (int)(Origin.X / 16);
 					int newChunkZ = (int)(Origin.Z / 16);
 					if (firstRun || oldChunkX != newChunkX || oldChunkZ != newChunkZ) {
@@ -96,11 +115,10 @@ namespace Survivalist {
 							}
 						}
 					}
-				}
 
-				lastUpdateX = Origin.X;
-				lastUpdateY = Origin.Y;
-				lastUpdateZ = Origin.Z;
+					lastChunkUpdateX = Origin.X;
+					lastChunkUpdateZ = Origin.Z;
+				}
 				firstRun = false;
 			}
 
@@ -177,16 +195,23 @@ namespace Survivalist {
 
 		// Check if a specific player is in range and subscribe/unsubscribe it depending on that
 		public void Update(Player player) {
-			if (Origin == player)
+			if (Origin == player || Origin.Deleted)
 				return;
 
-			var distanceX = Math.Abs(player.X - Origin.X);
-			var distanceZ = Math.Abs(player.Z - Origin.Z);
+			var distanceX = player.X - Origin.X;
+			var distanceY = player.Y - Origin.Y;
+			var distanceZ = player.Z - Origin.Z;
+			var distance = distanceX * distanceX + distanceY * distanceY + distanceZ * distanceZ;
+
 			// Add or remove entity depending on range
-			if (distanceX <= trackRange && distanceZ <= trackRange) {
+			if (distance <= trackRange * trackRange) {
 				if (!subscribedEntities.Contains(player)) {
 					subscribedEntities.Add(player);
 					player.Client.SendPacket(CreateAddPacket());
+				}
+
+				if (distance <= TouchDistance * TouchDistance) {
+					Origin.OnPlayerTouched(player);
 				}
 			} else if (subscribedEntities.Contains(player)) {
 				// The player went out of range, remove him

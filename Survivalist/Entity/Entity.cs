@@ -11,6 +11,8 @@ namespace Survivalist {
 		public float RotationX, RotationY;
 		public double MoveX, MoveY, MoveZ;
 
+		public bool Deleted = false;
+
 		public static int EncodePosition(double pos) {
 			return (int)Math.Floor(pos * 32);
 		}
@@ -44,6 +46,10 @@ namespace Survivalist {
 			double dY = Y - y;
 			double dZ = Z - z;
 			return dX * dX + dY * dY + dZ * dZ;
+		}
+
+		public virtual void OnPlayerTouched(Player player) {
+			Console.WriteLine("touched " + Id);
 		}
 	}
 }

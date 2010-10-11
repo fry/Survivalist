@@ -5,8 +5,14 @@ using System.Text;
 
 namespace Survivalist {
 	public class ItemEntity: Entity {
-		public int TypeId;
-		public int Count;
-		public int Durability;
+		public short TypeId;
+		public byte Count;
+		public short Durability;
+
+		public override void OnPlayerTouched(Player player) {
+			Console.WriteLine("touched item");
+			player.World.EntityHandler.RemoveEntity(this);
+			player.CollectItem(this);
+		}
 	}
 }

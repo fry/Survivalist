@@ -26,11 +26,13 @@ namespace Survivalist {
 			AddPacketType(0x0F, typeof(PlayerPlaceBlockPacket));
 
 			AddPacketType(0x10, typeof(PlayerChangeActiveItemPacket));
+			AddPacketType(0x11, typeof(PlayerAddItemPacket));
 
 			AddPacketType(0x12, typeof(EntityUpdateArmPacket));
 
 			AddPacketType(0x14, typeof(SpawnNamedEntityPacket));
 			AddPacketType(0x15, typeof(SpawnItemEntityPacket));
+			AddPacketType(0x16, typeof(PlayerCollectItemEntityPacket));
 
 			AddPacketType(0x1D, typeof(DestroyEntityPacket));
 			AddPacketType(0x1E, typeof(EntityInitializePacket));
