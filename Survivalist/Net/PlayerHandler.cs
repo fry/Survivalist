@@ -20,7 +20,7 @@ namespace Survivalist {
 			this.player = player;
 
 			pipe.SetHandler(this);
-			server.World.ChunkPool.AddPlayer(player);
+			//server.World.ChunkPool.AddPlayer(player);
 			//pipe.SendPacket(new PositionPacket(0, 4, 0));
 			SetPosition(player.X, player.Y, player.Z, 0, 0);
 

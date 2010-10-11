@@ -25,16 +25,6 @@ namespace Survivalist {
 			return chunk;
 		}
 
-		public void AddPlayer(Player player) {
-			int chunkX = (int)player.X >> 4;
-			int chunky = (int)player.Z >> 4;
-			for (int x = chunkX - EntityTracker.ChunkRange; x < chunkX + EntityTracker.ChunkRange; x++) {
-				for (int y = chunkX - EntityTracker.ChunkRange; y < chunkX + EntityTracker.ChunkRange; y++) {
-					GetChunk(x, y).AddPlayer(player);
-				}
-			}
-		}
-
 		public void Tick() {
 
 		}
