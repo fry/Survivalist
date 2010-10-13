@@ -15,16 +15,16 @@ namespace Survivalist {
 			return x << 11 | z << 7 | y;
 		}
 
-		public int GetValue(int x, int y, int z) {
+		public byte GetValue(int x, int y, int z) {
 			int index = GetIndex(x, y, z);
 			int half = index & 1;
 			index = index / 2;
 
 			var entry = Data[index];
 			if (half == 0)
-				return entry & 0xF;
+				return (byte)(entry & 0xF);
 			else
-				return (entry >> 4) & 0xF;
+				return (byte)((entry >> 4) & 0xF);
 		}
 
 		public void SetValue(int x, int y, int z, int value) {
@@ -72,7 +72,7 @@ namespace Survivalist {
 			Blocks[index] = type;
 		}
 
-		public int GetBlock(int x, int y, int z) {
+		public byte GetBlock(int x, int y, int z) {
 			return Blocks[BlockData.GetIndex(x, y, z)];
 		}
 		//public void 

@@ -7,11 +7,11 @@ namespace Survivalist {
 	public class World {
 		public EntityHandler EntityHandler;
 		public ChunkCache ChunkCache;
-		public ChunkPool ChunkPool;
+		public ActiveChunkPool ChunkPool;
 
 		public World() {
 			ChunkCache = new ChunkCache(new RandomChunkSource());
-			ChunkPool = new ChunkPool(ChunkCache);
+			ChunkPool = new ActiveChunkPool(this, ChunkCache);
 			EntityHandler = new EntityHandler(this);
 		}
 
@@ -35,30 +35,28 @@ namespace Survivalist {
 			var chunk = GetChunk(x >> 4, z >> 4);
 			int tileX = x & 0xF;
 			int tileZ = z & 0xF;
-
-			BlockUpdateEventArgs args = null;
+			int oldTypeId = chunk.GetBlock(tileX, y, tileZ);
 			// Send Destroyed event
 			if (invokeEvents) {
-				args = new BlockUpdateEventArgs { World = this, X = x, Y = y, Z = z };
-				int oldTypeId = chunk.GetBlock(tileX, y, tileZ);
 				var block = Block.Blocks[oldTypeId];
-				if (block != null)
-					block.OnBlockDestroyed(args);
+				if (block != null) {
+					block.OnDestroyed(this, x, y, z);
+				}
 			}
 			chunk.SetBlock(tileX, y, tileZ, (byte)typeID);
+			ChunkPool.OnTileChanged(oldTypeId, x, y, z);
 
-			// Send Created event(int)BlockType.Dirt
+			// Send Placed event
 			if (invokeEvents) {
 				var block = Block.Blocks[typeID];
 				if (block != null)
-					block.OnBlockCreated(args);
+					block.OnPlaced(this, x, y, z);
 			}
-
-			ChunkPool.GetChunk(x >> 4, z >> 4).Broadcast(new UpdateBlockPacket(this, x, y, z));
 		}
 
-		public void Tick() {
+		public void OnTick() {
 			EntityHandler.Tick();
+			ChunkPool.OnTick();
 		}
 
 		public bool IsValid(int x, int y, int z) {

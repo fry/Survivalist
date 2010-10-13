@@ -117,6 +117,7 @@ namespace Survivalist {
 						}
 					}
 				}
+				return;
 			}
 			string message = String.Format("<{0}> {1}", player.Name, packet.Message);
 			Broadcast(new ChatPacket(message));
@@ -158,6 +159,7 @@ namespace Survivalist {
 				typeId = packet.Type;
 
 			server.World.SetBlockType(destX, destY, destZ, typeId);
+			pipe.SendPacket(new UpdateBlockPacket(player.World, destX, destY, destZ));
 		}
 
 		public override void OnError(string reason) {

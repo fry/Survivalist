@@ -34,7 +34,7 @@ namespace Survivalist {
 		}
 
 		void Tick() {
-			World.Tick();
+			World.OnTick();
 			ConnectionHandler.HandlePackets();
 		}
 	}

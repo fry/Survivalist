@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PowerCollections">
+      <HintPath>..\PowerCollections.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,8 +52,8 @@
     <Compile Include="Chunk\Block.cs" />
     <Compile Include="Chunk\ChunkData.cs" />
     <Compile Include="Chunk\ChunkCache.cs" />
-    <Compile Include="Chunk\ChunkPool.cs" />
-    <Compile Include="Chunk\LoadedChunk.cs" />
+    <Compile Include="Chunk\ActiveChunkPool.cs" />
+    <Compile Include="Chunk\ActiveChunk.cs" />
     <Compile Include="Chunk\RandomChunkSource.cs" />
     <Compile Include="Chunk\ChunkSource.cs" />
     <Compile Include="Entity\ItemEntity.cs" />
