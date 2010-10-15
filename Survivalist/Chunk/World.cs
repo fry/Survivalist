@@ -43,6 +43,45 @@ namespace Survivalist {
 					block.OnDestroyed(this, x, y, z);
 				}
 			}
+
+			chunk.MetaData.SetValue(tileX, y, tileZ, 0);
+			chunk.SetBlock(tileX, y, tileZ, (byte)typeID);
+			ChunkPool.OnTileChanged(oldTypeId, x, y, z);
+
+			// Send Placed event
+			if (invokeEvents) {
+				var block = Block.Blocks[typeID];
+				if (block != null)
+					block.OnPlaced(this, x, y, z);
+			}
+		}
+
+		public void SetBlockData(int x, int y, int z, int metaData) {
+			if (!IsValid(x, y, z))
+				return;
+			var chunk = GetChunk(x >> 4, z >> 4);
+			int tileX = x & 0xF;
+			int tileZ = z & 0xF;
+
+			chunk.MetaData.SetValue(tileX, y, tileZ, metaData);
+			ChunkPool.OnTileChanged(null, x, y, z);
+		}
+
+		public void SetBlock(int x, int y, int z, int typeID, int metaData, bool invokeEvents = true) {
+			if (!IsValid(x, y, z))
+				return;
+			var chunk = GetChunk(x >> 4, z >> 4);
+			int tileX = x & 0xF;
+			int tileZ = z & 0xF;
+			int oldTypeId = chunk.GetBlock(tileX, y, tileZ);
+			// Send Destroyed event
+			if (invokeEvents) {
+				var block = Block.Blocks[oldTypeId];
+				if (block != null) {
+					block.OnDestroyed(this, x, y, z);
+				}
+			}
+			chunk.MetaData.SetValue(tileX, y, tileZ, metaData);
 			chunk.SetBlock(tileX, y, tileZ, (byte)typeID);
 			ChunkPool.OnTileChanged(oldTypeId, x, y, z);
 
