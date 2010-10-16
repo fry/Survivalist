@@ -9,8 +9,8 @@ namespace Survivalist {
 		public static bool[] DynamicBlocks = new bool[256];
 
 		public static void AddBlock(Block block) {
-			if (Blocks[block.TypeId] != null)
-				throw new ArgumentException("Tried to register a duplicate block: " + block.TypeId);
+			//if (Blocks[block.TypeId] != null)
+			//	throw new ArgumentException("Tried to register a duplicate block: " + block.TypeId);
 			Blocks[block.TypeId] = block;
 			DynamicBlocks[block.TypeId] = block.Dynamic;
 		}
@@ -62,6 +62,10 @@ namespace Survivalist {
 		}
 
 		static Block() {
+			for (int i = 0; i < 256; i++) {
+				AddBlock(new Block { TypeId = i });
+			}
+
 			AddBlock(new Block {
 				TypeId = (int)BlockType.Grass
 			});
@@ -117,7 +121,7 @@ namespace Survivalist {
 				var onWater = groundtype == (int)BlockType.Water || groundtype == (int)BlockType.StillWater;
 				if (!isFalling) {
 					var maxNHeight = FindMaxNHeight(world, x, y, z);
-					if (maxNHeight > height) { // this block is higher than our highest neighbor
+					if (maxNHeight >= height) { // this block is higher than our highest neighbor
 						if (height == 7)
 							world.SetBlockType(x, y, z, (int)BlockType.Air);
 						else {
@@ -133,7 +137,13 @@ namespace Survivalist {
 				} else {
 					var aboveType = world.GetBlockType(x, y + 1, z);
 					if (aboveType != (int)BlockType.Water && aboveType != (int)BlockType.StillWater) {
-						world.SetBlockType(x, y, z, (int)BlockType.Air);
+						if (height == 7)
+							world.SetBlockType(x, y, z, (int)BlockType.Air);
+						else {
+							world.SetBlockData(x, y, z, height + 1);
+							world.ChunkPool.ScheduleUpdate(500, x, y, z);
+							ActivateNeighbors(world, x, y, z);
+						}
 						return;
 					}
 				}
@@ -142,15 +152,8 @@ namespace Survivalist {
 					return;
 			}
 
-			if (height == 7) {
-				world.SetBlockType(x, y, z, (int)BlockType.Air);
-				return;
-			}
-
-			var twobelowType = world.GetBlockType(x, y - 2, z);
-			var fallMetaData = twobelowType == (int)BlockType.Air ? 8 : 0;
 			height++;
-			if (!DoFlow(world, x, y - 1, z, fallMetaData)) {
+			if (!DoFlow(world, x, y - 1, z, 8) && height < 8) {
 				DoFlow(world, x - 1, y, z, height);
 				DoFlow(world, x + 1, y, z, height);
 				DoFlow(world, x, y, z - 1, height);
