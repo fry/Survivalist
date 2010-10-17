@@ -1,0 +1,3 @@
+[submodule "libnbt"]
+	path = libnbt
+	url = http://github.com/aphistic/libnbt.git
