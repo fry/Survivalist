@@ -32,6 +32,7 @@ namespace Survivalist {
 		}
 
 		public virtual void OnPlaced(World world, int x, int y, int z) {
+			ActivateBlock(world, x, y, z);
 			ActivateNeighbors(world, x, y, z);
 		}
 
@@ -106,19 +107,22 @@ namespace Survivalist {
 	}
 
 	public class LiquidBlock : Block {
-		public override void OnPlaced(World world, int x, int y, int z) {
-			world.ChunkPool.ScheduleUpdate(500, x, y, z);
+		public LiquidBlock() {
+			Delay = 250;
 		}
 
 		public override void OnUpdate(World world, int x, int y, int z) {
 			var type = world.GetBlockType(x, y, z);
+			var groundtype = world.GetBlockType(x, y - 1, z);
 			var metaData = world.GetBlockData(x, y, z);
 			var height = GetHeight(metaData);
 			var isFalling = IsFalling(metaData);
+			var onWater = groundtype == (int)BlockType.Water || groundtype == (int)BlockType.StillWater;
 
+			// Still water drains and has some restriction the way it can flow:
+			// 1) It can't flow on top of water tiles
+			// 2) It can't spread if it is falling
 			if (type == (int)BlockType.Water) {
-				var groundtype = world.GetBlockType(x, y - 1, z);
-				var onWater = groundtype == (int)BlockType.Water || groundtype == (int)BlockType.StillWater;
 				if (!isFalling) {
 					var maxNHeight = FindMaxNHeight(world, x, y, z);
 					if (maxNHeight >= height) { // this block is higher than our highest neighbor
@@ -126,23 +130,24 @@ namespace Survivalist {
 							world.SetBlockType(x, y, z, (int)BlockType.Air);
 						else {
 							world.SetBlockData(x, y, z, height + 1);
-							world.ChunkPool.ScheduleUpdate(500, x, y, z);
 							ActivateNeighbors(world, x, y, z);
+							ActivateBlock(world, x, y, z);
 						}
 						return;
 					} else if (height != maxNHeight + 1) { // this block needs to grow
 						world.SetBlockData(x, y, z, Math.Min(7, maxNHeight + 1));
 						ActivateNeighbors(world, x, y, z);
+						ActivateBlock(world, x, y, z);
 					}
 				} else {
 					var aboveType = world.GetBlockType(x, y + 1, z);
 					if (aboveType != (int)BlockType.Water && aboveType != (int)BlockType.StillWater) {
-						if (height == 7)
+						if (height >= 6)
 							world.SetBlockType(x, y, z, (int)BlockType.Air);
 						else {
-							world.SetBlockData(x, y, z, height + 1);
-							world.ChunkPool.ScheduleUpdate(500, x, y, z);
+							world.SetBlockData(x, y, z, height + 2);
 							ActivateNeighbors(world, x, y, z);
+							ActivateBlock(world, x, y, z);
 						}
 						return;
 					}
@@ -153,12 +158,27 @@ namespace Survivalist {
 			}
 
 			height++;
-			if (!DoFlow(world, x, y - 1, z, 8) && height < 8) {
-				DoFlow(world, x - 1, y, z, height);
-				DoFlow(world, x + 1, y, z, height);
-				DoFlow(world, x, y, z - 1, height);
-				DoFlow(world, x, y, z + 1, height);
+			// PROBLEM: water doesn't flow into sideway directions if placed in air
+			// Only flow either up or horizontally in one tick, and never flow if we're already of the smallest kind
+			if (height >= 8)
+				return;
+			bool flowDown = DoFlow(world, x, y - 1, z, 8);
+			if (!flowDown || (onWater && type == (int)BlockType.StillWater)) {
+				if (!FlowRadius(world, x, y, z, 1, height))
+					if (!FlowRadius(world, x, y, z, 2, height))
+						if (!FlowRadius(world, x, y, z, 3, height))
+							if (!FlowRadius(world, x, y, z, 4, height)) {
+								// No drop down, flow in all directions
+								bool didFlow = DoFlow(world, x - 1, y, z, height);
+								didFlow = DoFlow(world, x + 1, y, z, height) || didFlow;
+								didFlow = DoFlow(world, x, y, z - 1, height) || didFlow;
+								didFlow = DoFlow(world, x, y, z + 1, height) || didFlow;
+							}
+				return;
 			}
+
+			// Schedule new update for this block if we flowed once (down or sideways)
+			ActivateBlock(world, x, y, z);
 		}
 
 		protected int GetHeight(int metaData) {
@@ -188,12 +208,45 @@ namespace Survivalist {
 				height = 0;
 		}
 
+		protected bool IsDrop(int type) {
+			return type == (int)BlockType.Air || type == (int)BlockType.Water || type == (int)BlockType.StillWater;
+		}
+
+		protected bool FlowRadius(World world, int x, int y, int z, int radius, int metaData) {
+			bool didFlow = false;
+			int checkY = y - 1;
+			// Flow north?
+			for (int i = x - radius; i < x + radius; i++) {
+				if (IsDrop(world.GetBlockType(i, checkY, z - radius)))
+					didFlow = DoFlow(world, x, y, z - 1, metaData) || didFlow;
+			}
+			// Flow south?
+			for (int i = x - radius; i < x + radius; i++) {
+				if (IsDrop(world.GetBlockType(i, checkY, z + radius)))
+					didFlow = DoFlow(world, x, y, z + 1, metaData) || didFlow;
+			}
+			// Flow west?
+			for (int i = z - radius; i < z + radius; i++) {
+				if (IsDrop(world.GetBlockType(x - radius, checkY, i)))
+					didFlow = DoFlow(world, x - 1, y, z, metaData) || didFlow;
+			}
+			// Flow east?
+			for (int i = z - radius; i < z + radius; i++) {
+				if (IsDrop(world.GetBlockType(x + radius, checkY, i)))
+					didFlow = DoFlow(world, x + 1, y, z, metaData) || didFlow;
+			}
+			return didFlow;
+		}
+
 		protected bool DoFlow(World world, int x, int y, int z, int metaData) {
 			var type = world.GetBlockType(x, y, z);
+			if (type == (int)BlockType.Water || type == (int)BlockType.StillWater)
+				return true;
 			if (type == (int)BlockType.Air) {
 				if (metaData == 7)
 					return false;
 				world.SetBlock(x, y, z, (int)BlockType.Water, metaData);
+				ActivateNeighbors(world, x, y, z);
 				return true;
 			}
 			return false;
