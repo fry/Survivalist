@@ -33,6 +33,15 @@ namespace Survivalist {
 			return chunk;
 		}
 
+		public void SaveAll() {
+			Console.WriteLine("[ActiveChunkPool] Saving all chunks");
+			foreach (DictionaryEntry entry in chunks) {
+				var chunk = entry.Value as ActiveChunk;
+				cache.Save(chunk.Position.X, chunk.Position.Y);
+			}
+			Console.WriteLine("[ActiveChunkPool] .. done");
+		}
+
 		public void OnTick() {
 			ProcessChunkUpdates();
 		}

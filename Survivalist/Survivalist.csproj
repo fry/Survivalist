@@ -34,6 +34,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="LibNbt">
+      <HintPath>..\libnbt\LibNbt\bin\LibNbt.dll</HintPath>
+    </Reference>
     <Reference Include="PowerCollections">
       <HintPath>..\PowerCollections.dll</HintPath>
     </Reference>
@@ -54,6 +57,7 @@
     <Compile Include="Chunk\ChunkCache.cs" />
     <Compile Include="Chunk\ActiveChunkPool.cs" />
     <Compile Include="Chunk\ActiveChunk.cs" />
+    <Compile Include="Chunk\NBTChunkSource.cs" />
     <Compile Include="Chunk\RandomChunkSource.cs" />
     <Compile Include="Chunk\ChunkSource.cs" />
     <Compile Include="Entity\ItemEntity.cs" />

@@ -6,10 +6,11 @@ using System.Text;
 namespace Survivalist {
 	public class Player: NamedEntity {
 		public World World;
-		public LoginHandler Client { get; protected set; }
+		public PacketPipe Client { get; protected set; }
 		protected HashSet<ChunkPosition> chunksToSend = new HashSet<ChunkPosition>();
 
-		public Player(LoginHandler client, World world, string name): base(name) {
+		public Player(PacketPipe client, World world, string name)
+			: base(name) {
 			Client = client;
 			this.World = world;
 		}

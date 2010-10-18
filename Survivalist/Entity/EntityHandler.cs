@@ -56,10 +56,10 @@ namespace Survivalist {
 			RemoveEntity(player);
 		}
 
-		public Player NewPlayer(LoginHandler client, string accountName, string serverPassword) {
+		public Player NewPlayer(PacketPipe client, string accountName, string serverPassword) {
 			var player = new Player(client, world, accountName);
 			player.X = 0;
-			player.Y = 64;
+			player.Y = 100;
 			player.Z = 0;
 			Console.WriteLine("Player #{0} connected: {1}", player.Id, accountName);
 			return player;

@@ -29,7 +29,7 @@ namespace Survivalist {
 			pipe.SendPacket(new LoginPacket(0, "", ""));
 			pipe.SendPacket(new PositionPacket(0, 64, 0));
 
-			var player = server.World.EntityHandler.NewPlayer(this, packet.AccountName, packet.Password);
+			var player = server.World.EntityHandler.NewPlayer(pipe, packet.AccountName, packet.Password);
 			var ingame = new PlayerHandler(server, pipe, player);
 			server.ConnectionHandler.AddPlayer(ingame);
 			server.World.EntityHandler.AddPlayer(player);

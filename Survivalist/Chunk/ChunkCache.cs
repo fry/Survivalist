@@ -16,7 +16,7 @@ namespace Survivalist {
 		}
 
 		public ChunkData Get(int x, int y) {
-			ulong hashKey = (uint)x | (ulong)(uint)y << 32;
+			ulong hashKey = BuildKey(x, y);
 			ChunkData chunk = cache[hashKey] as ChunkData;
 			if (chunk == null) {
 				Console.WriteLine("[ChunkCache] Loading {0}, {1}", x, y);
@@ -27,10 +27,28 @@ namespace Survivalist {
 			return chunk;
 		}
 
-		public void Unload(int x, int y) {
-			Console.WriteLine("[ChunkCache] Unloading {0}, {1}", x, y);
-
+		public void Save(int x, int y) {
+			var key = BuildKey(x, y);
+			if (cache.ContainsKey(key)) {
+				var chunk = cache[key] as ChunkData;
+				source.Save(x, y, chunk);
+			}
 		}
+
+		public void Unload(int x, int y) {
+			var key = BuildKey(x, y);
+			if (cache.ContainsKey(key)) {
+				Console.WriteLine("[ChunkCache] Unloading {0}, {1}", x, y);
+				var chunk = cache[key] as ChunkData;
+				source.Save(x, y, chunk);
+				cache.Remove(key);
+			}
+		}
+
+		protected ulong BuildKey(int x, int y) {
+			return (uint)x | (ulong)(uint)y << 32;
+		}
+
 		// GetTileType
 		// SetTile
 	}

@@ -33,6 +33,7 @@ namespace Survivalist {
 			mainInv[5] = new InventoryItem((int)BlockType.StillLava, -1);
 			mainInv[6] = new InventoryItem((int)BlockType.StillWater, -1);
 			mainInv[7] = new InventoryItem((int)BlockType.Sponge, -1);
+			mainInv[8] = new InventoryItem(277, 1);
 			pipe.SendPacket(new SendInventoryPacket(InventoryType.Main, mainInv));
 			pipe.SendPacket(new SendInventoryPacket(InventoryType.Crafting, new InventoryItem[4]));
 			pipe.SendPacket(new SendInventoryPacket(InventoryType.Armor, new InventoryItem[4]));
@@ -116,6 +117,8 @@ namespace Survivalist {
 							pipe.SendPacket(new ChatPacket("Couldn't find player " + p[1]));
 						}
 					}
+				} else if (p[0] == "/save") {
+					server.World.ChunkPool.SaveAll();
 				}
 				return;
 			}

@@ -10,7 +10,7 @@ namespace Survivalist {
 		public ActiveChunkPool ChunkPool;
 
 		public World() {
-			ChunkCache = new ChunkCache(new RandomChunkSource());
+			ChunkCache = new ChunkCache(new NBTChunkSource(@"..\..\..\World1"));
 			ChunkPool = new ActiveChunkPool(this, ChunkCache);
 			EntityHandler = new EntityHandler(this);
 		}
