@@ -185,6 +185,8 @@ namespace Survivalist {
 				return;
 			}
 
+			if (flowDown && y == 0)
+				return;
 			// Schedule new update for this block if we flowed once (down or sideways)
 			ActivateBlock(world, x, y, z);
 		}

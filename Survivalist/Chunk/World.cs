@@ -8,8 +8,28 @@ namespace Survivalist {
 		public EntityHandler EntityHandler;
 		public ChunkCache ChunkCache;
 		public ActiveChunkPool ChunkPool;
+		public double TimeFactor;
+
+		double time;
+		public double Time {
+			get {
+				return time;
+			}
+			set {
+				time = value % 24000;
+			}
+		}
+
+		/// <summary>
+		/// Update time on server and all clients
+		/// </summary>
+		public void UpdateTime(int time) {
+			Time = time;
+			EntityHandler.Broadcast(new UpdateTimePacket(time));
+		}
 
 		public World() {
+			TimeFactor = 0.02;
 			ChunkCache = new ChunkCache(new NBTChunkSource(@"..\..\..\World1"));
 			ChunkPool = new ActiveChunkPool(this, ChunkCache);
 			EntityHandler = new EntityHandler(this);
@@ -93,7 +113,12 @@ namespace Survivalist {
 			}
 		}
 
-		public void OnTick() {
+		public void OnTick(int delta) {
+			// Update and broadcast time
+			Time += delta * TimeFactor;
+			if (Time % 20 == 0)
+				EntityHandler.Broadcast(new UpdateTimePacket((int)Time));
+
 			EntityHandler.Tick();
 			ChunkPool.OnTick();
 		}

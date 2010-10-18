@@ -22,6 +22,12 @@ namespace Survivalist {
 			}
 		}
 
+		public void Broadcast(Packet packet) {
+			foreach (var player in Players) {
+				player.Client.SendPacket(packet);
+			}
+		}
+
 		public void TrackEntity(Entity entity, int range, int interval) {
 			var tracker = new EntityTracker(world, entity, range, interval);
 			tracker.UpdatePosition(players);

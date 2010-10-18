@@ -37,7 +37,7 @@ namespace Survivalist {
 			pipe.SendPacket(new SendInventoryPacket(InventoryType.Main, mainInv));
 			pipe.SendPacket(new SendInventoryPacket(InventoryType.Crafting, new InventoryItem[4]));
 			pipe.SendPacket(new SendInventoryPacket(InventoryType.Armor, new InventoryItem[4]));
-			pipe.SendPacket(new UpdateTimePacket(0));
+			pipe.SendPacket(new UpdateTimePacket((int)server.World.Time));
 			Broadcast(new ChatPacket("Player connected: " + player.Name));
 		}
 
@@ -112,13 +112,32 @@ namespace Survivalist {
 					} else {
 						var toPlayer = server.World.EntityHandler.Players.FirstOrDefault(e => e.Name == p[1]);
 						if (toPlayer != null) {
-							SetPosition(toPlayer.X, toPlayer.Y, toPlayer.Z, 0, 0);
+							SetPosition(toPlayer.X, toPlayer.Y + 2, toPlayer.Z, 0, 0);
 						} else {
 							pipe.SendPacket(new ChatPacket("Couldn't find player " + p[1]));
 						}
 					}
 				} else if (p[0] == "/save") {
 					server.World.ChunkPool.SaveAll();
+				} else if (p[0] == "/time") {
+					if (p.Length == 2) {
+						int time;
+						if (int.TryParse(p[1], out time))
+							server.World.UpdateTime(time);
+					}
+				} else if (p[0] == "/item") {
+					if (p.Length == 2) {
+						int id;
+						if (int.TryParse(p[1], out id))
+							pipe.SendPacket(new PlayerAddItemPacket {
+								Count = 255,
+								TypeId = (short)id
+							});
+					}
+				} else if (p[0] == "/reltp") {
+					int x, y, z;
+					if (p.Length == 4 && int.TryParse(p[1], out x) && int.TryParse(p[2], out y) && int.TryParse(p[3], out z))
+						SetPosition(player.X + x, player.Y + y, player.Z + z, player.RotationX, player.RotationY);
 				}
 				return;
 			}
