@@ -80,6 +80,22 @@ namespace Survivalist {
 			LastSent = DateTime.Now;
 		}
 
+		// Invokes the OnCreated event on every dynamic block in this chunk
+		public void Initialize() {
+			int tileX = Position.X * 16;
+			int tileZ = Position.Y * 16;
+			for (int x = 0; x < 16; x++) {
+				for (int y = 0; y < 128; y++) {
+					for (int z = 0; z < 16; z++) {
+						var type = data.GetBlock(x, y, z);
+						var block = Block.Blocks[type];
+						if (block.Dynamic)
+							ScheduleUpdate(block.Delay, x, y, z);
+					}
+				}
+			}
+		}
+
 		public void Broadcast(Packet packet) {
 			foreach (var player in players) {
 				player.Client.SendPacket(packet);

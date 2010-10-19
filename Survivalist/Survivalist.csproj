@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Chunk\Block.cs" />
+    <Compile Include="Chunk\Blocks\LiquidBlock.cs" />
     <Compile Include="Chunk\ChunkData.cs" />
     <Compile Include="Chunk\ChunkCache.cs" />
     <Compile Include="Chunk\ActiveChunkPool.cs" />

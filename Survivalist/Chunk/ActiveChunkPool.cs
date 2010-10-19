@@ -26,7 +26,7 @@ namespace Survivalist {
 			if (chunk == null && load) {
 				var data = cache.Get(x, y);
 				chunk = new ActiveChunk(world, data, x, y);
-				InitializeChunk(data, x, y);
+				chunk.Initialize();
 				chunks.Add(hashKey, chunk);
 			}
 
@@ -59,22 +59,6 @@ namespace Survivalist {
 					chunk.SendUpdates();
 				}
 				chunk.ProcessUpdates();
-			}
-		}
-
-		// Invokes the OnCreated event on every dynamic block in this chunk
-		protected void InitializeChunk(ChunkData data, int chunkX, int chunkY) {
-			int tileX = chunkX * 16;
-			int tileZ = chunkY * 16;
-			for (int x = 0; x < 16; x++) {
-				for (int y = 0; y < 128; y++) {
-					for (int z = 0; z < 16; z++) {
-						var type = data.GetBlock(x, y, z);
-						if (Block.DynamicBlocks[type]) {
-							Block.Blocks[type].OnCreated(world, x, y, z);
-						}
-					}
-				}
 			}
 		}
 
