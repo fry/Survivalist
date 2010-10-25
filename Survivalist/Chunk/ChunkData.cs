@@ -67,24 +67,33 @@ namespace Survivalist {
 			BlockLight = new BlockData(blocks.Length);
 		}
 
+		public bool RecievesSkyLight(int x, int y, int z) {
+			return y >= Heightmap[z << 4 | x];
+		}
+
 		public void SetBlock(int x, int y, int z, byte type) {
 			var index = BlockData.GetIndex(x, y, z);
 			Blocks[index] = type;
-
-			var height = Heightmap[z << 4 | x];
-			if (!Block.TransparentBlocks[type]) {
-				// Block is not transparent and placed above the lowest height, recalculate lighting
-				if (y >= height)
-					DoSkyLight(x, y + 1, z);
-			} else if (y == height - 1) {
-				DoSkyLight(x, y, z);
-			}
 		}
 
 		public byte GetBlock(int x, int y, int z) {
 			return Blocks[BlockData.GetIndex(x, y, z)];
 		}
-		//public void 
+
+		public int GetLight(LightType type, int x, int y, int z) {
+			if (type == LightType.Block)
+				return BlockLight.GetValue(x, y, z);
+			else if (type == LightType.Sky)
+				return SkyLight.GetValue(x, y, z);
+			return 0;
+		}
+
+		public void SetLight(LightType type, int x, int y, int z, int value) {
+			if (type == LightType.Block)
+				BlockLight.SetValue(x, y, z, value);
+			else if (type == LightType.Sky)
+				SkyLight.SetValue(x, y, z, value);
+		}
 
 		public int Write(byte[] dest, int xstart, int ystart, int zstart, int xend, int yend, int zend, int start) {
 			for (int x = xstart; x < xend; x++) {
@@ -100,46 +109,6 @@ namespace Survivalist {
 			start = BlockLight.Write(dest, xstart, ystart, zstart, xend, yend, zend, start);
 			start = SkyLight.Write(dest, xstart, ystart, zstart, xend, yend, zend, start);
 			return start;
-		}
-
-		public void RecalculateLighting() {
-			for (int x = 0; x < 16; x++) {
-				for (int z = 0; z < 16; z++) {
-					Heightmap[z << 4 | x] = 0;
-					DoSkyLight(x, 128, z);
-				}
-			}
-		}
-
-		protected void DoSkyLight(int x, int ystart, int z) {
-			var heightmapIndex = z << 4 | x;
-			var height = Heightmap[heightmapIndex];
-
-			// How far we should calculate. Never calculate further than the lowest block.
-			int newHeight = Math.Max(height, ystart);
-
-			// We need to cast light through transparent blocks
-			while (newHeight > 0 && Block.TransparentBlocks[GetBlock(x, newHeight, z)])
-				newHeight--;
-
-			// Nothing changed, we don't need to calculate
-			if (newHeight == height)
-				return;
-
-			Heightmap[heightmapIndex] = (byte)newHeight;
-
-			/* The new height is lower than the last, that means all the tiles
-			 * above are fully lit */
-			if (newHeight < height) {
-				for (int y = newHeight; y < height; y++) {
-					SkyLight.SetValue(x, y, z, 15);
-				}
-			}
-			else {
-				for (int y = height; y < newHeight; y++) {
-					SkyLight.SetValue(x, y, z, 0);
-				}
-			}
 		}
 	}
 }

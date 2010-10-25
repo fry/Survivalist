@@ -20,17 +20,22 @@ namespace Survivalist {
 		}
 
 		public ActiveChunk GetChunk(int x, int y, bool load = true) {
-			ulong hashKey = (uint)x | (ulong)(uint)y << 32;
+			var hashKey = GetChunkHash(x, y);
 			ActiveChunk chunk = chunks[hashKey] as ActiveChunk;
 
 			if (chunk == null && load) {
 				var data = cache.Get(x, y);
 				chunk = new ActiveChunk(world, data, x, y);
+				world.Lighting.RecalculateLighting(data);
 				chunk.Initialize();
 				chunks.Add(hashKey, chunk);
 			}
 
 			return chunk;
+		}
+
+		public bool IsChunkLoaded(int x, int y) {
+			return chunks.ContainsKey(GetChunkHash(x, y));
 		}
 
 		public void SaveAll() {
@@ -50,6 +55,10 @@ namespace Survivalist {
 			var chunk = GetChunk(x >> 4, z >> 4, false);
 			if (chunk != null)
 				chunk.OnTileChanged(oldType, x & 0xF, y, z & 0xF);
+		}
+
+		protected ulong GetChunkHash(int x, int y) {
+			return (uint)x | (ulong)(uint)y << 32;
 		}
 
 		protected void ProcessChunkUpdates() {

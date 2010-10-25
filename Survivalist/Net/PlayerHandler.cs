@@ -118,7 +118,9 @@ namespace Survivalist {
 						}
 					}
 				} else if (p[0] == "/save") {
+					Broadcast(new ChatPacket("Saving world.."));
 					server.World.ChunkPool.SaveAll();
+					Broadcast(new ChatPacket(".. done."));
 				} else if (p[0] == "/time") {
 					if (p.Length == 2) {
 						int time;
@@ -138,6 +140,8 @@ namespace Survivalist {
 					int x, y, z;
 					if (p.Length == 4 && int.TryParse(p[1], out x) && int.TryParse(p[2], out y) && int.TryParse(p[3], out z))
 						SetPosition(player.X + x, player.Y + y, player.Z + z, player.RotationX, player.RotationY);
+				} else {
+					pipe.SendPacket(new ChatPacket("Unknown command: " + p[0]));
 				}
 				return;
 			}
@@ -176,12 +180,12 @@ namespace Survivalist {
 				destX++;
 
 			// TODO: deal with using items (ids >= 256) here
-			int typeId = (int)BlockType.Dirt;
-			if (packet.Type != -1 && packet.Type < 256)
-				typeId = packet.Type;
+			if (packet.Type != -1 && packet.Type < 256) {
+				int typeId = packet.Type;
 
-			server.World.SetBlockType(destX, destY, destZ, typeId);
-			pipe.SendPacket(new UpdateBlockPacket(player.World, destX, destY, destZ));
+				server.World.SetBlockType(destX, destY, destZ, typeId);
+				pipe.SendPacket(new UpdateBlockPacket(player.World, destX, destY, destZ));
+			}
 		}
 
 		public override void OnError(string reason) {

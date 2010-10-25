@@ -8,6 +8,7 @@ namespace Survivalist {
 		public EntityHandler EntityHandler;
 		public ChunkCache ChunkCache;
 		public ActiveChunkPool ChunkPool;
+		public LightingEngine Lighting;
 		public double TimeFactor;
 
 		double time;
@@ -30,9 +31,10 @@ namespace Survivalist {
 
 		public World() {
 			TimeFactor = 0.02;
-			ChunkCache = new ChunkCache(new NBTChunkSource(@"..\..\..\World1"));
+			ChunkCache = new ChunkCache(new NBTChunkSource(@"..\..\..\World2"));
 			ChunkPool = new ActiveChunkPool(this, ChunkCache);
 			EntityHandler = new EntityHandler(this);
+			Lighting = new LightingEngine(this);
 		}
 
 		public ChunkData GetChunk(int x, int y) {
@@ -47,6 +49,32 @@ namespace Survivalist {
 
 		public int GetBlockData(int x, int y, int z) {
 			return GetChunk(x >> 4, z >> 4).MetaData.GetValue(x & 0xF, y, z & 0xF);
+		}
+
+		public int GetLight(LightType type, int x, int y, int z) {
+			if (!IsValid(x, y, z))
+				return 0;
+
+			int chunkX = x >> 4;
+			int chunkY = z >> 4;
+			if (!IsChunkLoaded(chunkX, chunkY))
+				return 0;
+
+			var chunk = GetChunk(chunkX, chunkY);
+			return chunk.GetLight(type, x & 0xF, y, z & 0xF);
+		}
+
+		public void SetLight(LightType type, int x, int y, int z, int value) {
+			if (!IsValid(x, y, z))
+				return;
+
+			int chunkX = x >> 4;
+			int chunkY = z >> 4;
+			if (!IsChunkLoaded(chunkX, chunkY))
+				return;
+
+			var chunk = GetChunk(chunkX, chunkY);
+			chunk.SetLight(type, x & 0xF, y, z & 0xF, value);
 		}
 
 		public void SetBlockType(int x, int y, int z, int typeID, bool invokeEvents = true) {
@@ -104,6 +132,7 @@ namespace Survivalist {
 			chunk.MetaData.SetValue(tileX, y, tileZ, metaData);
 			chunk.SetBlock(tileX, y, tileZ, (byte)typeID);
 			ChunkPool.OnTileChanged(oldTypeId, x, y, z);
+			Lighting.OnTileChanged(chunk, tileX, y, tileZ);
 
 			// Send Placed event
 			if (invokeEvents) {
@@ -121,10 +150,37 @@ namespace Survivalist {
 
 			EntityHandler.Tick();
 			ChunkPool.OnTick();
+			Lighting.RunUpdates();
 		}
 
 		public bool IsValid(int x, int y, int z) {
 			return Math.Abs(x) <= 32000000 && Math.Abs(z) <= 32000000 && y >= 0 && y < 128;
+		}
+
+		public bool IsLoaded(int x, int y) {
+			return ChunkPool.IsChunkLoaded(x >> 4, y >> 4);
+		}
+
+		public bool IsLoaded(int x, int y, int z) {
+			return y >= 0 && y < 128 && IsLoaded(x, z);
+		}
+
+		public bool IsChunkLoaded(int x, int y) {
+			return ChunkPool.IsChunkLoaded(x, y);
+		}
+
+		public bool RecievesSkyLight(int x, int y, int z) {
+			if (!IsValid(x, y, z))
+				return false;
+
+			int chunkX = x >> 4;
+			int chunkY = z >> 4;
+
+			var chunk = GetChunk(chunkX, chunkY);
+			if (chunk == null)
+				return false;
+
+			return chunk.RecievesSkyLight(x & 0xF, y, z & 0xF);
 		}
 	}
 }

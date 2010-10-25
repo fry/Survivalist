@@ -7,25 +7,27 @@ namespace Survivalist {
 	public class Block {
 		public static Block[] Blocks = new Block[256];
 		public static bool[] DynamicBlocks = new bool[256];
-		public static bool[] TransparentBlocks = new bool[256];
+		public static int[] LightAbsorbs = new int[256];
+		public static int[] LightEmits = new int[256];
 
 		public static void AddBlock(Block block) {
 			//if (Blocks[block.TypeId] != null)
 			//	throw new ArgumentException("Tried to register a duplicate block: " + block.TypeId);
 			Blocks[block.TypeId] = block;
 			DynamicBlocks[block.TypeId] = block.Dynamic;
-			TransparentBlocks[block.TypeId] = block.Transparent;
+			LightEmits[block.TypeId] = block.LightEmitted;
+			LightAbsorbs[block.TypeId] = block.LightAbsorbed;
 		}
 
 		public int TypeId;
-		// null for none, everything else means some light is emitted and needs to be calculated
-		public int? Luminosity = null;
-		// whether light goes through this block
-		public bool Transparent = true;
 		// whether this block can schedule updates
 		public bool Dynamic = false;
 		// the default delay this block is updated at if it is dynamic
 		public int Delay = 500;
+		// how much light this block absorbs
+		public int LightAbsorbed = 0;
+		// how much light this block emits
+		public int LightEmitted = 0;
 
 		public virtual void OnCreated(World world, int x, int y, int z) {
 			if (Dynamic)
@@ -68,42 +70,52 @@ namespace Survivalist {
 				AddBlock(new Block { TypeId = i });
 			}
 
-			AddBlock(new Block {
+			AddBlock(new SolidBlock {
 				TypeId = (int)BlockType.Grass
 			});
-			AddBlock(new Block {
+			AddBlock(new SolidBlock {
 				TypeId = (int)BlockType.Dirt
 			});
 			AddBlock(new Block {
 				TypeId = (int)BlockType.Air,
-				Transparent = true
+				LightAbsorbed = 0
 			});
 			AddBlock(new Block {
 				TypeId = (int)BlockType.Leaves,
-				Transparent = true
+				LightAbsorbed = 1
 			});
 			AddBlock(new LiquidBlock {
 				TypeId = (int)BlockType.StillLava,
 				FlowingType = (int)BlockType.Lava,
 				SourceType = (int)BlockType.StillLava,
-				Delay = 1000
+				Delay = 1000,
+				LightAbsorbed = 15
 			});
 			AddBlock(new LiquidBlock {
 				TypeId = (int)BlockType.Lava,
 				FlowingType = (int)BlockType.Lava,
 				SourceType = (int)BlockType.StillLava,
-				Delay = 1000
+				Delay = 1000,
+				LightAbsorbed = 15
 			});
 			AddBlock(new LiquidBlock {
 				TypeId = (int)BlockType.StillWater,
 				FlowingType = (int)BlockType.Water,
-				SourceType = (int)BlockType.StillWater
+				SourceType = (int)BlockType.StillWater,
+				LightAbsorbed = 3
 			});
 			AddBlock(new LiquidBlock {
 				TypeId = (int)BlockType.Water,
 				FlowingType = (int)BlockType.Water,
-				SourceType = (int)BlockType.StillWater
+				SourceType = (int)BlockType.StillWater,
+				LightAbsorbed = 3
 			});
+		}
+	}
+
+	public class SolidBlock: Block {
+		public SolidBlock() {
+			LightAbsorbed = 15;
 		}
 	}
 

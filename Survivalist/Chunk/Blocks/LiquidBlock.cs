@@ -11,7 +11,6 @@ namespace Survivalist {
 		public LiquidBlock() {
 			Delay = 250;
 			Dynamic = true;
-			Transparent = true;
 		}
 
 		public override void OnUpdate(World world, int x, int y, int z) {

@@ -21,7 +21,6 @@ namespace Survivalist {
 			if (chunk == null) {
 				Console.WriteLine("[ChunkCache] Loading {0}, {1}", x, y);
 				chunk = source.Load(x, y);
-				chunk.RecalculateLighting();
 				cache[hashKey] = chunk;
 			}
 
