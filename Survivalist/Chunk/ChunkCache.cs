@@ -11,11 +11,17 @@ namespace Survivalist {
 		ChunkSource source;
 		Hashtable cache = new Hashtable();
 
+		int lastChunkX, lastChunkY;
+		ChunkData lastChunk;
+
 		public ChunkCache(ChunkSource source) {
 			this.source = source;
 		}
 
 		public ChunkData Get(int x, int y) {
+			if (lastChunk != null && lastChunkX == x && lastChunkY == y)
+				return lastChunk;
+
 			ulong hashKey = BuildKey(x, y);
 			ChunkData chunk = cache[hashKey] as ChunkData;
 			if (chunk == null) {
@@ -23,6 +29,10 @@ namespace Survivalist {
 				chunk = source.Load(x, y);
 				cache[hashKey] = chunk;
 			}
+
+			lastChunkX = x;
+			lastChunkY = y;
+			lastChunk = chunk;
 
 			return chunk;
 		}

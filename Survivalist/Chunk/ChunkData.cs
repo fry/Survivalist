@@ -68,14 +68,14 @@ namespace Survivalist {
 		}
 
 		public bool RecievesSkyLight(int x, int y, int z) {
-			return y >= Heightmap[z << 4 | x];
+			return y >= GetHeight(x, z);
 		}
 
 		public void SetBlock(int x, int y, int z, byte type) {
 			var index = BlockData.GetIndex(x, y, z);
 			Blocks[index] = type;
 		}
-
+		 
 		public byte GetBlock(int x, int y, int z) {
 			return Blocks[BlockData.GetIndex(x, y, z)];
 		}
@@ -93,6 +93,14 @@ namespace Survivalist {
 				BlockLight.SetValue(x, y, z, value);
 			else if (type == LightType.Sky)
 				SkyLight.SetValue(x, y, z, value);
+		}
+
+		public int GetHeight(int x, int z) {
+			return Heightmap[z << 4 | x];
+		}
+
+		public void SetHeight(int x, int z, int height) {
+			Heightmap[z << 4 | x] = (byte)height;
 		}
 
 		public int Write(byte[] dest, int xstart, int ystart, int zstart, int xend, int yend, int zend, int start) {

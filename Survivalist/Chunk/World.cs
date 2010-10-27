@@ -95,6 +95,7 @@ namespace Survivalist {
 			chunk.MetaData.SetValue(tileX, y, tileZ, 0);
 			chunk.SetBlock(tileX, y, tileZ, (byte)typeID);
 			ChunkPool.OnTileChanged(oldTypeId, x, y, z);
+			Lighting.OnTileChanged(x, y, z);
 
 			// Send Placed event
 			if (invokeEvents) {
@@ -132,7 +133,7 @@ namespace Survivalist {
 			chunk.MetaData.SetValue(tileX, y, tileZ, metaData);
 			chunk.SetBlock(tileX, y, tileZ, (byte)typeID);
 			ChunkPool.OnTileChanged(oldTypeId, x, y, z);
-			Lighting.OnTileChanged(chunk, tileX, y, tileZ);
+			Lighting.OnTileChanged(x, y, z);
 
 			// Send Placed event
 			if (invokeEvents) {
@@ -140,6 +141,14 @@ namespace Survivalist {
 				if (block != null)
 					block.OnPlaced(this, x, y, z);
 			}
+		}
+
+		public int GetHeight(int x, int z) {
+			if (!IsValid(x, 0, z))
+				return 0;
+
+			var chunk = GetChunk(x >> 4, z >> 4);
+			return chunk.GetHeight(x & 0xF, z & 0xF);
 		}
 
 		public void OnTick(int delta) {

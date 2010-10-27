@@ -26,7 +26,7 @@ namespace Survivalist {
 			if (chunk == null && load) {
 				var data = cache.Get(x, y);
 				chunk = new ActiveChunk(world, data, x, y);
-				world.Lighting.RecalculateLighting(data);
+				world.Lighting.RecalculateLighting(x, y);
 				chunk.Initialize();
 				chunks.Add(hashKey, chunk);
 			}
