@@ -29,9 +29,9 @@ namespace Survivalist {
 			EntityHandler.Broadcast(new UpdateTimePacket(time));
 		}
 
-		public World() {
+		public World(ChunkSource source) {
 			TimeFactor = 0.02;
-			ChunkCache = new ChunkCache(new NBTChunkSource(@"..\..\..\World2"));
+			ChunkCache = new ChunkCache(source);
 			ChunkPool = new ActiveChunkPool(this, ChunkCache);
 			EntityHandler = new EntityHandler(this);
 			Lighting = new LightingEngine(this);

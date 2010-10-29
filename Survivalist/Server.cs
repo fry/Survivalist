@@ -14,7 +14,7 @@ namespace Survivalist {
 		public World World;
 
 		public Server() {
-			World = new World();
+			World = new World(new NBTChunkSource(@"..\..\..\World1"));
 			ConnectionHandler = new ConnectionHandler(this, 12345);
 		}
 

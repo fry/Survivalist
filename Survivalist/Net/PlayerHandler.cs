@@ -154,14 +154,12 @@ namespace Survivalist {
 		}
 
 		public override void Handle(PlayerDigPacket packet) {
-			//Console.WriteLine("Dig: {0}, {1}, {2}, {3}, {4}", packet.State, packet.DigX, packet.DigY, packet.DigZ, packet.Face);
 			if (packet.State == 3) {
 				server.World.SetBlockType(packet.DigX, packet.DigY, packet.DigZ, (int)BlockType.Air);
 			}
 		}
 
 		public override void Handle(PlayerPlaceBlockPacket packet) {
-			//pipe.SendPacket(new ChatPacket(String.Format("{0}, {1}, {2}", packet.X, packet.Y, packet.Z)));
 			int destX = packet.X;
 			int destY = packet.Y;
 			int destZ = packet.Z;
@@ -178,6 +176,9 @@ namespace Survivalist {
 				destX--;
 			else if (packet.Face == 5)
 				destX++;
+
+			var light = player.World.GetLight(LightType.Sky, destX, destY, destZ);
+			pipe.SendPacket(new ChatPacket(String.Format("{0}, {1}, {2}: {3}", packet.X, packet.Y, packet.Z, light)));
 
 			// TODO: deal with using items (ids >= 256) here
 			if (packet.Type != -1 && packet.Type < 256) {

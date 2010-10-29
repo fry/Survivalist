@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics;
 
 namespace Survivalist {
 	public enum LightType {
@@ -93,7 +94,7 @@ namespace Survivalist {
 					if (!world.IsLoaded(x, z))
 						continue;
 					for (int y = Area.Y1; y <= Area.Y2; y++) {
-						int oldLight = world.GetBlockData(x, y, z);
+						int oldLight = world.GetLight(Type, x, y, z);
 						int newLight = 0;
 
 						int blockType = world.GetBlockType(x, y, z);
@@ -154,7 +155,7 @@ namespace Survivalist {
 	}
 
 	public class LightingEngine {
-		List<LightingUpdate> scheduledUpdates = new List<LightingUpdate>();
+		LinkedList<LightingUpdate> scheduledUpdates = new LinkedList<LightingUpdate>();
 		World world;
 
 		public LightingEngine(World world) {
@@ -166,9 +167,8 @@ namespace Survivalist {
 			while (i > 0 && scheduledUpdates.Count > 0) {
 				i--;
 
-				var update = scheduledUpdates[0];
-				scheduledUpdates.RemoveAt(0);
-
+				var update = scheduledUpdates.Last.Value;
+				scheduledUpdates.RemoveLast();
 				update.Run(world);
 			}
 		}
@@ -185,10 +185,12 @@ namespace Survivalist {
 				return;
 
 			// Try to merge this update in one of the more recent updates
-			int updateCount = scheduledUpdates.Count;
-			int checkUpdates = Math.Min(10, updateCount);
-			for (int i = 0; i < checkUpdates; i++) {
-				var update = scheduledUpdates[updateCount - 1 - i];
+			int checkUpdates = 4;
+			
+			foreach(var update in scheduledUpdates) {
+				if (checkUpdates <= 0)
+					break;
+				checkUpdates--;
 				if (update.Type == type && update.TryExtend(area))
 					return;
 			}
@@ -196,10 +198,11 @@ namespace Survivalist {
 			var newUpdate = new LightingUpdate(this);
 			newUpdate.Area = area;
 			newUpdate.Type = type;
-			scheduledUpdates.Add(newUpdate);
+			scheduledUpdates.AddFirst(newUpdate);
 		}
 
 		public void TryUpdateTile(LightType type, int x, int y, int z, int newLight) {
+			Debug.Assert(newLight >= 0 && newLight <= 15);
 			if (!world.IsLoaded(x, y, z))
 				return;
 
@@ -212,7 +215,8 @@ namespace Survivalist {
 				newLight = Math.Max(newLight, emitsLight);
 			}
 
-			if (world.GetLight(type, x, y, z) != newLight)
+			var oldLight = world.GetLight(type, x, y, z);
+			if (oldLight != newLight)
 				ScheduleUpdate(type, x, y, z);
 		}
 
@@ -227,13 +231,18 @@ namespace Survivalist {
 				// block is placed just below the max height
 				DoSkyLight(x, y, z);
 			}
+
+			ScheduleUpdate(LightType.Sky, x, y, z);
+			ScheduleUpdate(LightType.Block, x, y, z);
 		}
 
 		public void RecalculateLighting(int chunkX, int chunkZ) {
 			var chunk = world.GetChunk(chunkX, chunkZ);
+			chunkX *= 16;
+			chunkZ *= 16;
 			for (int x = 0; x < 16; x++) {
 				for (int z = 0; z < 16; z++) {
-					chunk.SetHeight(x, z, 0);
+					chunk.SetHeight(x, z, 1);
 					DoSkyLight(chunkX + x, 127, chunkZ + z);
 				}
 			}
@@ -245,11 +254,11 @@ namespace Survivalist {
 			var tileZ = z & 0xF;
 			var height = chunk.GetHeight(tileX, tileZ);
 
-			// How far we should calculate. Never calculate further than the lowest block.
+			// From where should we start calculating
 			int newHeight = Math.Max(height, ystart);
 
 			// We need to cast light through transparent blocks
-			while (newHeight > 0 && Block.LightAbsorbs[chunk.GetBlock(tileX, newHeight, tileZ)] == 0)
+			while (newHeight > 0 && Block.LightAbsorbs[chunk.GetBlock(tileX, newHeight - 1, tileZ)] == 0)
 				newHeight--;
 
 			// Nothing changed, we don't need to calculate
