@@ -242,7 +242,7 @@ namespace Survivalist {
 			chunkZ *= 16;
 			for (int x = 0; x < 16; x++) {
 				for (int z = 0; z < 16; z++) {
-					chunk.SetHeight(x, z, 1);
+					chunk.SetHeight(x, z, 0);
 					DoSkyLight(chunkX + x, 127, chunkZ + z);
 				}
 			}

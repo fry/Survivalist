@@ -154,12 +154,14 @@ namespace Survivalist {
 		}
 
 		public override void Handle(PlayerDigPacket packet) {
+			Console.WriteLine("dig");
 			if (packet.State == 3) {
 				server.World.SetBlockType(packet.DigX, packet.DigY, packet.DigZ, (int)BlockType.Air);
 			}
 		}
 
 		public override void Handle(PlayerPlaceBlockPacket packet) {
+			Console.WriteLine("place");
 			int destX = packet.X;
 			int destY = packet.Y;
 			int destZ = packet.Z;
