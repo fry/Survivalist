@@ -60,7 +60,12 @@ namespace Survivalist {
 
 		public byte[] Heightmap = new byte[16*16];
 
-		public ChunkData(byte[] blocks) {
+		public int X { get; protected set; }
+		public int Y { get; protected set; }
+
+		public ChunkData(int chunkX, int chunkY, byte[] blocks) {
+			X = chunkX;
+			Y = chunkY;
 			Blocks = blocks;
 			MetaData = new BlockData(blocks.Length);
 			SkyLight = new BlockData(blocks.Length);

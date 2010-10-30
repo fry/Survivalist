@@ -38,35 +38,42 @@ namespace Survivalist {
 		public ChunkData Load(int x, int y) {
 			NbtFile nbt;
 			if (!OpenChunk(x, y, out nbt))
-				return GenerateNewChunk(x, y);
+				return null;
 
 			var root = nbt.RootTag;
 			var level = root["Level"] as NbtCompound;
 
 			var blocks = level["Blocks"] as NbtByteArray;
-			var chunk = new ChunkData(blocks.Value);
+			//var chunkX = level["xPos"] as NbtInt;
+			//var chunkY = level["yPos"] as NbtInt;
+			var chunk = new ChunkData(x, y, blocks.Value);
 			chunk.BlockLight.Data = (level["BlockLight"] as NbtByteArray).Value;
 			chunk.SkyLight.Data = (level["SkyLight"] as NbtByteArray).Value;
 			chunk.MetaData.Data = (level["Data"] as NbtByteArray).Value;
+			chunk.Heightmap = (level["HeightMap"] as NbtByteArray).Value;
 
 			nbt.Dispose();
 
 			return chunk;
 		}
 
-		public void Save(int x, int y, ChunkData chunk) {
+		public void Save(ChunkData chunk) {
 			var nbt = new NbtFile {
 				RootTag = new NbtCompound("", new NbtTag[] {
 					new NbtCompound("Level", new NbtTag[] {
 						new NbtByteArray("Blocks", chunk.Blocks),
 						new NbtByteArray("BlockLight", chunk.BlockLight.Data),
 						new NbtByteArray("SkyLight", chunk.SkyLight.Data),
-						new NbtByteArray("Data", chunk.MetaData.Data)
+						new NbtByteArray("Data", chunk.MetaData.Data),
+						new NbtByteArray("HeightMap", chunk.Heightmap),
+
+						new NbtInt("xPos", chunk.X),
+						new NbtInt("yPos", chunk.Y),
 					})
 				})
 			};
 
-			var path = GetChunkPath(x, y);
+			var path = GetChunkPath(chunk.X, chunk.Y);
 			Directory.CreateDirectory(Path.GetDirectoryName(path));
 			nbt.SaveFile(path, true);
 		}
@@ -94,23 +101,6 @@ namespace Survivalist {
 		protected void SaveChunk(int x, int y, NbtFile file) {
 			var realPath = GetChunkPath(x, y);
 			file.SaveFile(realPath, true);
-		}
-
-		protected ChunkData GenerateNewChunk(int x, int y) {
-			var flatChunk = new ChunkData(new byte[16 * 16 * 128]);
-			for (int tx = 0; tx < 16; tx++) {
-				for (int tz = 0; tz < 16; tz++) {
-
-					for (int ty = 0; ty < 5; ty++) {
-						flatChunk.SetBlock(tx, ty, tz, (int)BlockType.Grass);
-					}
-					for (int ty = 5; ty < 128; ty++) {
-						flatChunk.SkyLight.SetValue(tx, ty, tz, 15);
-					}
-				}
-			}
-
-			return flatChunk;
 		}
 	}
 }

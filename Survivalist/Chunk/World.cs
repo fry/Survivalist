@@ -31,10 +31,10 @@ namespace Survivalist {
 
 		public World(ChunkSource source) {
 			TimeFactor = 0.02;
-			ChunkCache = new ChunkCache(source);
-			ChunkPool = new ActiveChunkPool(this, ChunkCache);
 			EntityHandler = new EntityHandler(this);
 			Lighting = new LightingEngine(this);
+			ChunkCache = new ChunkCache(source, new FlatChunkGenerator(Lighting));
+			ChunkPool = new ActiveChunkPool(this, ChunkCache);
 		}
 
 		public ChunkData GetChunk(int x, int y) {

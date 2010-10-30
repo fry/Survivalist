@@ -9,13 +9,15 @@ namespace Survivalist {
 	 * unloaded chunks */
 	public class ChunkCache {
 		ChunkSource source;
+		ChunkGenerator generator;
 		Hashtable cache = new Hashtable();
 
 		int lastChunkX, lastChunkY;
 		ChunkData lastChunk;
 
-		public ChunkCache(ChunkSource source) {
+		public ChunkCache(ChunkSource source, ChunkGenerator generator) {
 			this.source = source;
+			this.generator = generator;
 		}
 
 		public ChunkData Get(int x, int y) {
@@ -27,6 +29,9 @@ namespace Survivalist {
 			if (chunk == null) {
 				Console.WriteLine("[ChunkCache] Loading {0}, {1}", x, y);
 				chunk = source.Load(x, y);
+				// Failed to load chunk, generate a new one
+				if (chunk == null)
+					chunk = generator.GenerateNewChunk(x, y);
 				cache[hashKey] = chunk;
 			}
 
@@ -41,7 +46,7 @@ namespace Survivalist {
 			var key = BuildKey(x, y);
 			if (cache.ContainsKey(key)) {
 				var chunk = cache[key] as ChunkData;
-				source.Save(x, y, chunk);
+				source.Save(chunk);
 			}
 		}
 
@@ -50,7 +55,7 @@ namespace Survivalist {
 			if (cache.ContainsKey(key)) {
 				Console.WriteLine("[ChunkCache] Unloading {0}, {1}", x, y);
 				var chunk = cache[key] as ChunkData;
-				source.Save(x, y, chunk);
+				source.Save(chunk);
 				cache.Remove(key);
 			}
 		}

@@ -28,7 +28,7 @@ namespace Survivalist {
 			mainInv[0] = new InventoryItem((int)BlockType.Stone, -1);
 			mainInv[1] = new InventoryItem((int)BlockType.Dirt, -1);
 			mainInv[2] = new InventoryItem((int)BlockType.Cobblestone, -1);
-			mainInv[3] = new InventoryItem((int)BlockType.Planks, -1);
+			mainInv[3] = new InventoryItem((int)BlockType.Wood, -1);
 			mainInv[4] = new InventoryItem((int)BlockType.Sand, -1);
 			mainInv[5] = new InventoryItem((int)BlockType.StillLava, -1);
 			mainInv[6] = new InventoryItem((int)BlockType.StillWater, -1);
@@ -180,7 +180,8 @@ namespace Survivalist {
 				destX++;
 
 			var light = player.World.GetLight(LightType.Sky, destX, destY, destZ);
-			pipe.SendPacket(new ChatPacket(String.Format("{0}, {1}, {2}: {3}", packet.X, packet.Y, packet.Z, light)));
+			var blockLight = player.World.GetLight(LightType.Block, destX, destY, destZ);
+			pipe.SendPacket(new ChatPacket(String.Format("{0}, {1}, {2}: {3}, {4}", packet.X, packet.Y, packet.Z, light, blockLight)));
 
 			// TODO: deal with using items (ids >= 256) here
 			if (packet.Type != -1 && packet.Type < 256) {

@@ -4,8 +4,7 @@ using System.Linq;
 using System.Text;
 
 namespace Survivalist {
-	public interface ChunkSource {
-		ChunkData Load(int x, int y);
-		void Save(ChunkData chunk);
+	public interface ChunkGenerator {
+		ChunkData GenerateNewChunk(int x, int y);
 	}
 }

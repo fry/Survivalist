@@ -58,6 +58,8 @@
     <Compile Include="Chunk\ChunkCache.cs" />
     <Compile Include="Chunk\ActiveChunkPool.cs" />
     <Compile Include="Chunk\ActiveChunk.cs" />
+    <Compile Include="Chunk\ChunkGenerator.cs" />
+    <Compile Include="Chunk\FlatChunkGenerator.cs" />
     <Compile Include="Chunk\LightingEngine.cs" />
     <Compile Include="Chunk\NBTChunkSource.cs" />
     <Compile Include="Chunk\RandomChunkSource.cs" />

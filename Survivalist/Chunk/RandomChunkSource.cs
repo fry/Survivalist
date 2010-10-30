@@ -17,10 +17,10 @@ namespace Survivalist {
 
 		public ChunkData Load(int x, int y) {
 			var rand = new Random(seed + x + y * 1024);
-			var chunk = new ChunkData(new byte[16 * 16 * 128]);
+			var chunk = new ChunkData(x, y, new byte[16 * 16 * 128]);
 			for (int tx = 0; tx < 16; tx++) {
 				for (int tz = 0; tz < 16; tz++) {
-					/*for (int ty = 0; ty < 1; ty++) {
+					for (int ty = 0; ty < 1; ty++) {
 						chunk.SetBlock(tx, ty, tz, 1);
 					}
 					for (int ty = 1; ty < 3; ty++) {
@@ -52,20 +52,13 @@ namespace Survivalist {
 							chunk.SkyLight.SetValue(tx, ty, tz, 15);
 						if (t == 10)
 							chunk.BlockLight.SetValue(tx, ty, tz, 15);
-					}*/
-
-					for (int ty = 0; ty < 5; ty++) {
-						chunk.SetBlock(tx, ty, tz, (int)BlockType.Grass);
-					}
-					for (int ty = 5; ty < 128; ty++) {
-						chunk.SkyLight.SetValue(tx, ty, tz, 15);
 					}
 				}
 			}
 			return chunk;
 		}
 
-		public void Save(int x, int y, ChunkData chunk) {
+		public void Save(ChunkData chunk) {
 		}
 	}
 }

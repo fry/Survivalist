@@ -80,23 +80,78 @@ namespace Survivalist {
 				TypeId = (int)BlockType.Air,
 				LightAbsorbed = 0
 			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.Stone
+			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.Cobblestone
+			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.Wood
+			});
+			AddBlock(new Block {
+				TypeId = (int)BlockType.Sapling
+			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.Bedrock
+			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.Sand
+			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.Gravel
+			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.GoldOre
+			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.IronOre
+			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.Coal
+			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.Log
+			});
 			AddBlock(new Block {
 				TypeId = (int)BlockType.Leaves,
 				LightAbsorbed = 1
 			});
+			AddBlock(new SolidBlock {
+				TypeId = (int)BlockType.Sponge
+			});
+			AddBlock(new Block {
+				TypeId = (int)BlockType.Glass,
+				LightAbsorbed = 0
+			});
+			// ...
+			AddBlock(new Block {
+				TypeId = (int)BlockType.Torch,
+				LightAbsorbed = 0,
+				LightEmitted = 14
+			});
+
+			AddBlock(new Block {
+				TypeId = (int)BlockType.Fire,
+				LightAbsorbed = 0,
+				LightEmitted = 15
+			});
+
 			AddBlock(new LiquidBlock {
 				TypeId = (int)BlockType.StillLava,
 				FlowingType = (int)BlockType.Lava,
 				SourceType = (int)BlockType.StillLava,
 				Delay = 1000,
-				LightAbsorbed = 15
+				LightAbsorbed = 15,
+				LightEmitted = 15
 			});
 			AddBlock(new LiquidBlock {
 				TypeId = (int)BlockType.Lava,
 				FlowingType = (int)BlockType.Lava,
 				SourceType = (int)BlockType.StillLava,
 				Delay = 1000,
-				LightAbsorbed = 15
+				LightAbsorbed = 15,
+				LightEmitted = 15
 			});
 			AddBlock(new LiquidBlock {
 				TypeId = (int)BlockType.StillWater,
@@ -151,8 +206,8 @@ namespace Survivalist {
 		Grass = 2,
 		Dirt = 3,
 		Cobblestone = 4,
-		Planks = 5,
-		Plant = 6,
+		Wood = 5,
+		Sapling = 6,
 		Bedrock = 7,
 		Water = 8,
 		StillWater = 9,

@@ -220,63 +220,63 @@ namespace Survivalist {
 				ScheduleUpdate(type, x, y, z);
 		}
 
-		public void OnTileChanged(int x, int y, int z) {
-			var type = world.GetBlockType(x, y, z);
-			var height = world.GetHeight(x, z);
+		public void OnTileChanged(int tileX, int y, int tileZ) {
+			int x = tileX & 0xF;
+			int z = tileZ & 0xF;
+			var chunk = world.GetChunk(tileX >> 4, tileZ >> 4);
+			var type = chunk.GetBlock(x, y, z);
+			var height = chunk.GetHeight(x, z);
 			if (Block.LightAbsorbs[type] > 0) {
 				// Block absorbs light, and placed in the way of the skylight so cast a new ray
 				if (y >= height)
-					DoSkyLight(x, y + 1, z);
+					DoSkyLight(chunk, x, y + 1, z);
 			} else if (y == height - 1) {
 				// block is placed just below the max height
-				DoSkyLight(x, y, z);
+				DoSkyLight(chunk, x, y, z);
 			}
 
-			ScheduleUpdate(LightType.Sky, x, y, z);
-			ScheduleUpdate(LightType.Block, x, y, z);
+			ScheduleUpdate(LightType.Sky, tileX, y, tileZ);
+			ScheduleUpdate(LightType.Block, tileX, y, tileZ);
 		}
 
-		public void RecalculateLighting(int chunkX, int chunkZ) {
-			var chunk = world.GetChunk(chunkX, chunkZ);
-			chunkX *= 16;
-			chunkZ *= 16;
+		public void RecalculateLighting(ChunkData chunk) {
 			for (int x = 0; x < 16; x++) {
 				for (int z = 0; z < 16; z++) {
 					chunk.SetHeight(x, z, 0);
-					DoSkyLight(chunkX + x, 127, chunkZ + z);
+					DoSkyLight(chunk, x, 127, z);
 				}
 			}
 		}
 
-		protected void DoSkyLight(int x, int ystart, int z) {
-			var chunk = world.GetChunk(x >> 4, z >> 4);
-			var tileX = x & 0xF;
-			var tileZ = z & 0xF;
-			var height = chunk.GetHeight(tileX, tileZ);
+		protected void DoSkyLight(ChunkData chunk, int x, int ystart, int z) {
+			var tileX = chunk.X * 16 + x;
+			var tileZ = chunk.Y * 16 + z;
+
+			var height = chunk.GetHeight(x, z);
 
 			// From where should we start calculating
 			int newHeight = Math.Max(height, ystart);
 
 			// We need to cast light through transparent blocks
-			while (newHeight > 0 && Block.LightAbsorbs[chunk.GetBlock(tileX, newHeight - 1, tileZ)] == 0)
+			while (newHeight > 0 && Block.LightAbsorbs[chunk.GetBlock(x, newHeight - 1, z)] == 0)
 				newHeight--;
 
 			// Nothing changed, we don't need to calculate
 			if (newHeight == height)
 				return;
 
-			chunk.SetHeight(tileX, tileZ, newHeight);
+			chunk.SetHeight(x, z, newHeight);
 
 			/* The new height is lower than the last, that means all the tiles
 			 * above are fully lit */
 			if (newHeight < height) {
 				for (int y = newHeight; y < height; y++) {
-					chunk.SkyLight.SetValue(tileX, y, tileZ, 15);
+					chunk.SkyLight.SetValue(x, y, z, 15);
 				}
 			} else if (newHeight > height) {
-				ScheduleUpdate(LightType.Sky, new Box(x, height, z, x, newHeight, z));
+				ScheduleUpdate(LightType.Sky, new Box(tileX, height, tileZ, tileX, newHeight, tileZ));
 				for (int y = height; y < newHeight; y++) {
-					chunk.SkyLight.SetValue(tileX, y, tileZ, 0);
+					chunk.SkyLight.SetValue(x, y, z, 0);
 				}
 			}
 		}
