@@ -7,6 +7,7 @@ namespace Survivalist {
 	public class LiquidBlock : Block {
 		public int SourceType;
 		public int FlowingType;
+		public int MaxHeight = 7;
 
 		public LiquidBlock() {
 			Delay = 250;
@@ -31,7 +32,7 @@ namespace Survivalist {
 					var maxNHeight = FindMaxNHeight(world, x, y, z);
 					if (maxNHeight >= height) { // this block is higher than our highest neighbor and needs to shrink
 						// If this already is the smallest block, disappear, otherwise shrink by 1
-						if (height == 7)
+						if (height == MaxHeight)
 							world.SetBlockType(x, y, z, (int)BlockType.Air);
 						else {
 							world.SetBlockData(x, y, z, height + 1);
@@ -41,7 +42,7 @@ namespace Survivalist {
 						return;
 					} else if (height != maxNHeight + 1) { // this block needs to grow
 						// Never grow higher than the max height
-						world.SetBlockData(x, y, z, Math.Min(7, maxNHeight + 1));
+						world.SetBlockData(x, y, z, Math.Min(MaxHeight, maxNHeight + 1));
 						ActivateNeighbors(world, x, y, z);
 						ActivateBlock(world, x, y, z);
 					}
@@ -50,10 +51,10 @@ namespace Survivalist {
 					var aboveType = world.GetBlockType(x, y + 1, z);
 					if (aboveType != FlowingType && aboveType != SourceType) {
 						// Falling water shrinks faster than normal tiles
-						if (height >= 7)
+						if (height >= MaxHeight)
 							world.SetBlockType(x, y, z, (int)BlockType.Air);
 						else {
-							world.SetBlockData(x, y, z, 7);
+							world.SetBlockData(x, y, z, MaxHeight);
 							ActivateNeighbors(world, x, y, z);
 							ActivateBlock(world, x, y, z);
 						}
@@ -68,7 +69,7 @@ namespace Survivalist {
 
 			// Set height of all following tiles and abort if this tile is already the smallest
 			height++;
-			if (height >= 8)
+			if (height > MaxHeight)
 				return;
 			// Source blocks also spread on top of water
 			bool flowDown = DoFlow(world, x, y - 1, z, 8);

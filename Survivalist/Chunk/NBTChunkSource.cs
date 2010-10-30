@@ -40,21 +40,26 @@ namespace Survivalist {
 			if (!OpenChunk(x, y, out nbt))
 				return null;
 
-			var root = nbt.RootTag;
-			var level = root["Level"] as NbtCompound;
+			try {
+				var root = nbt.RootTag;
+				var level = root["Level"] as NbtCompound;
 
-			var blocks = level["Blocks"] as NbtByteArray;
-			//var chunkX = level["xPos"] as NbtInt;
-			//var chunkY = level["yPos"] as NbtInt;
-			var chunk = new ChunkData(x, y, blocks.Value);
-			chunk.BlockLight.Data = (level["BlockLight"] as NbtByteArray).Value;
-			chunk.SkyLight.Data = (level["SkyLight"] as NbtByteArray).Value;
-			chunk.MetaData.Data = (level["Data"] as NbtByteArray).Value;
-			chunk.Heightmap = (level["HeightMap"] as NbtByteArray).Value;
+				var blocks = level["Blocks"] as NbtByteArray;
+				//var chunkX = level["xPos"] as NbtInt;
+				//var chunkY = level["yPos"] as NbtInt;
+				var chunk = new ChunkData(x, y, blocks.Value);
+				chunk.BlockLight.Data = (level["BlockLight"] as NbtByteArray).Value;
+				chunk.SkyLight.Data = (level["SkyLight"] as NbtByteArray).Value;
+				chunk.MetaData.Data = (level["Data"] as NbtByteArray).Value;
+				chunk.Heightmap = (level["HeightMap"] as NbtByteArray).Value;
 
-			nbt.Dispose();
-
-			return chunk;
+				return chunk;
+			} catch (Exception) {
+				Console.WriteLine("[NBTChunkSource] Failed to load chunk {0}, {1}", x, y);
+				return null;
+			} finally {
+				nbt.Dispose();
+			}
 		}
 
 		public void Save(ChunkData chunk) {

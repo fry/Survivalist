@@ -143,7 +143,8 @@ namespace Survivalist {
 				SourceType = (int)BlockType.StillLava,
 				Delay = 1000,
 				LightAbsorbed = 15,
-				LightEmitted = 15
+				LightEmitted = 15,
+				MaxHeight = 3
 			});
 			AddBlock(new LiquidBlock {
 				TypeId = (int)BlockType.Lava,
@@ -151,7 +152,8 @@ namespace Survivalist {
 				SourceType = (int)BlockType.StillLava,
 				Delay = 1000,
 				LightAbsorbed = 15,
-				LightEmitted = 15
+				LightEmitted = 15,
+				MaxHeight = 3
 			});
 			AddBlock(new LiquidBlock {
 				TypeId = (int)BlockType.StillWater,
