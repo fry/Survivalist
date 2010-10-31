@@ -155,7 +155,7 @@ namespace Survivalist {
 			// Update and broadcast time
 			Time += delta * TimeFactor;
 			if (Time % 20 == 0)
-				EntityHandler.Broadcast(new UpdateTimePacket((int)Time));
+				EntityHandler.Broadcast(new UpdateTimePacket((long)Time));
 
 			EntityHandler.Tick();
 			ChunkPool.OnTick();

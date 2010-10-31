@@ -7,7 +7,7 @@ namespace Survivalist {
 		public static void test(Random rand) {
 		}
 		public static void Main(string[] argv) {
-			/*var stream = new FileStream(@"D:\projects\Survivalist\data.dat", FileMode.Open);
+			var stream = new FileStream(@"D:\projects\Survivalist\data.dat", FileMode.Open);
 			var net = new NetworkReader(stream);
 
 			while (true) {
@@ -34,32 +34,11 @@ namespace Survivalist {
 					var mypacket = packet as PlayerDigPacket;
 					Console.WriteLine("Dig: {0}, {1}, {2}", mypacket.DigX, mypacket.DigY, mypacket.DigZ);
 				}
-			}*/
-
-			/*var stream = new MemoryStream();
-			var writer = new NetworkWriter(stream);
-			double val = 1000.12345678;
-			Console.WriteLine(val);
-			writer.WriteDouble(val);
-			stream.Seek(0, SeekOrigin.Begin);
-			var reader = new NetworkReader(stream);
-			Console.WriteLine(reader.ReadDouble());*/
-
-			var timer = new Stopwatch();
-			timer.Start();
-			Random rand = new Random();
-			int count = 20 * 20 * 6;
-			for (int i = 0; i < count; i++) {
-				var test = new OrderedBag<int>();
-				for (int j = 0; j < 1000; j++) {
-					test.Add(j);
-				}
-				while(test.Count > 0) {
-					test.RemoveFirst();
+				if (packet is LoginPacket) {
+					var mypacket = packet as LoginPacket;
+					Console.WriteLine("Login: {0}, {1}", mypacket.Time, mypacket.Unknown);
 				}
 			}
-			timer.Stop();
-			Console.WriteLine((float)timer.ElapsedMilliseconds / count);
 		}
 	}
 }

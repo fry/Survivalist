@@ -11,25 +11,33 @@ namespace Survivalist {
 		public int Version;
 		public string AccountName;
 		public string Password;
+		public long Time;
+		public byte Unknown;
 
 		public LoginPacket() { }
 
-		public LoginPacket(int version, string accountName, string password) {
+		public LoginPacket(int version, string accountName, string password, long time, int unknown) {
 			Version = version;
 			AccountName = accountName;
 			Password = password;
+			Time = time;
+			Unknown = (byte)unknown;
 		}
 
 		public override void Read(NetworkReader reader) {
 			Version = reader.ReadInt32();
 			AccountName = reader.ReadUTF8();
 			Password = reader.ReadUTF8();
+			Time = reader.ReadInt64();
+			Unknown = reader.ReadByte();
 		}
 
 		public override void Write(NetworkWriter writer) {
 			writer.WriteInt32((Int32)Version);
 			writer.WriteUTF8(AccountName);
 			writer.WriteUTF8(Password);
+			writer.WriteInt64(Time);
+			writer.WriteByte(Unknown);
 		}
 
 		public override void Handle(PacketHandler handler) {
