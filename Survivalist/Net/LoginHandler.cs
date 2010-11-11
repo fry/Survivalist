@@ -26,8 +26,14 @@ namespace Survivalist {
 
 		public override void Handle(LoginPacket packet) {
 			Console.WriteLine("Connected: {0}|{1}|{2}", packet.AccountName, packet.Password, packet.Version);
-			pipe.SendPacket(new LoginPacket(0, "", "", (long)server.World.Time, 0));
-			pipe.SendPacket(new PositionPacket(0, 64, 0));
+
+			if (packet.Version != Packet.Version) {
+				pipe.Close(String.Format("Invalid protocol version {0} != {1}", packet.Version, Packet.Version));
+				return;
+			}
+
+			pipe.SendPacket(new LoginPacket(0, "", "", (long)server.World.Time, -1));
+			pipe.SendPacket(new SetSpawnPacket(0, 64, 0));
 
 			var player = server.World.EntityHandler.NewPlayer(pipe, packet.AccountName, packet.Password);
 			var ingame = new PlayerHandler(server, pipe, player);

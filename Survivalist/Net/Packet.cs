@@ -6,6 +6,7 @@ using System.Runtime.Serialization;
 
 namespace Survivalist {
 	public abstract class Packet {
+		public static readonly int Version = 4;
 		static Dictionary<int, Type> IdTypes = new Dictionary<int, Type>();
 		static Dictionary<Type, int> TypeIds = new Dictionary<Type, int>();
 
@@ -16,7 +17,7 @@ namespace Survivalist {
 			AddPacketType(0x03, typeof(ChatPacket));
 			AddPacketType(0x04, typeof(UpdateTimePacket));
 			AddPacketType(0x05, typeof(SendInventoryPacket));
-			AddPacketType(0x06, typeof(PositionPacket));
+			AddPacketType(0x06, typeof(SetSpawnPacket));
 
 			AddPacketType(0x0A, typeof(FlyingPacket));
 			AddPacketType(0x0B, typeof(PlayerMovePacket));

@@ -18,8 +18,8 @@ namespace Survivalist {
 					Console.WriteLine("PlayerMoveLook: {0:0.00}, {1:0.00}, {2:0.00}, {3:0.00}", mypacket.X, mypacket.Y, mypacket.Stance, mypacket.Z);
 					Console.WriteLine("Rot: {0:0.00}; {1:0.00}", mypacket.RotationX, mypacket.RotationY);
 				}
-				if (packet is PositionPacket) {
-					var mypacket = packet as PositionPacket;
+				if (packet is SetSpawnPacket) {
+					var mypacket = packet as SetSpawnPacket;
 					Console.WriteLine("Pos: {0}, {1}, {2}", mypacket.X, mypacket.Y, mypacket.Z);
 				}
 				if (packet is UpdateTimePacket) {
@@ -36,7 +36,7 @@ namespace Survivalist {
 				}
 				if (packet is LoginPacket) {
 					var mypacket = packet as LoginPacket;
-					Console.WriteLine("Login: {0}, {1}", mypacket.Time, mypacket.Unknown);
+					Console.WriteLine("Login: {0}, {1}", mypacket.Time, mypacket.DimensionType);
 				}
 			}
 		}

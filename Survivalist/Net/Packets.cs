@@ -12,16 +12,16 @@ namespace Survivalist {
 		public string AccountName;
 		public string Password;
 		public long Time;
-		public byte Unknown;
+		public byte DimensionType;
 
 		public LoginPacket() { }
 
-		public LoginPacket(int version, string accountName, string password, long time, int unknown) {
+		public LoginPacket(int version, string accountName, string password, long time, int dimensionType) {
 			Version = version;
 			AccountName = accountName;
 			Password = password;
 			Time = time;
-			Unknown = (byte)unknown;
+			DimensionType = (byte)dimensionType;
 		}
 
 		public override void Read(NetworkReader reader) {
@@ -29,7 +29,7 @@ namespace Survivalist {
 			AccountName = reader.ReadUTF8();
 			Password = reader.ReadUTF8();
 			Time = reader.ReadInt64();
-			Unknown = reader.ReadByte();
+			DimensionType = reader.ReadByte();
 		}
 
 		public override void Write(NetworkWriter writer) {
@@ -37,7 +37,7 @@ namespace Survivalist {
 			writer.WriteUTF8(AccountName);
 			writer.WriteUTF8(Password);
 			writer.WriteInt64(Time);
-			writer.WriteByte(Unknown);
+			writer.WriteByte(DimensionType);
 		}
 
 		public override void Handle(PacketHandler handler) {
@@ -420,12 +420,12 @@ namespace Survivalist {
 	#endregion
 
 	#region PositionPackets
-	public class PositionPacket : Packet {
+	public class SetSpawnPacket : Packet {
 		public int X, Y, Z;
 
-		public PositionPacket() { }
+		public SetSpawnPacket() { }
 
-		public PositionPacket(int x, int y, int z) {
+		public SetSpawnPacket(int x, int y, int z) {
 			X = x;
 			Y = y;
 			Z = z;
